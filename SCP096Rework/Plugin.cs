@@ -24,12 +24,14 @@ namespace SCP096Rework
             handlers = new Handlers();
             PlayerEv.Died += handlers.OnDied;
             Scp096.Enraging += handlers.OnEnraging;
+            Scp096.ChargingPlayer += handlers.OnChargingPlayer;
             base.OnEnabled();
         }
         public override void OnDisabled()
         {
             PlayerEv.Died -= handlers.OnDied;
             Scp096.Enraging -= handlers.OnEnraging;
+            Scp096.ChargingPlayer -= handlers.OnChargingPlayer;
             handlers = null;
             base.OnDisabled();
         }

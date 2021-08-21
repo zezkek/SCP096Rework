@@ -22,7 +22,16 @@ namespace SCP096Rework
             Scp096 = ev.Player;
             Timing.RunCoroutine(CheckForTargets(ev));
             Timing.RunCoroutine(RefreshPosition());
-            ListOfTargets();
+            //ListOfTargets();
+        }
+        //public void suka(ev ev)
+        //{
+        //    ev.
+        //}
+        public void OnChargingPlayer(ChargingPlayerEventArgs ev)
+        {
+            Log.Info("Добавление первой цели в список");
+            targetplayers.Add(ev.Victim);
         }
         public void OnAddingTarget(AddingTargetEventArgs ev)
         {
@@ -63,51 +72,60 @@ namespace SCP096Rework
                 }
                 foreach (Player targetscp in AllPlayers.Where(x => x.Role == RoleType.Scp096 && x.Id==Scp096.Id))
                     Scp096 = targetscp;
+                Log.Info(targetplayers.Count.ToString());
             }
         }
-        private void ListOfTargets()
-        {
-            float mindistance = Vector3.Distance(targetplayers[0].Position, Scp096.Position);
-            int countoutside = 0;
-            int countoffice = 0;
-            int countheavy = 0;
-            int countlight = 0;
-            bool sameZone = false;
-            foreach (Player target in targetplayers)
-            {
-                if (target.Zone == Scp096.Zone)
-                {
-                    if (Vector3.Distance(target.Position, Scp096.Position) < mindistance)
-                        mindistance = Vector3.Distance(target.Position, Scp096.Position);
-                    sameZone = true;
-                }
-                else
-                {
-                    switch (target.Zone)
-                    {
-                        case ZoneType.Entrance:
-                            countoffice++;
-                            break;
-                        case ZoneType.Surface:
-                            countoutside++;
-                            break;
-                        case ZoneType.HeavyContainment:
-                            countheavy++;
-                            break;
-                        case ZoneType.LightContainment:
-                            countlight++;
-                            break;
-                    }
-                }
-            }
-            if(sameZone)
-                if (mindistance >= 30)
-                    Scp096.ShowHint("Расстояние до ближайшей цели: " + mindistance.ToString() + "\n", 1);
-                else
-                { }
-            else
-                Scp096.ShowHint("Целей на поверхности: " + countoutside + " Целей в офисной зоне: " + countoffice + "\n" 
-                    + "Целей в тяжелой зоне: " + countheavy + " Целей в легкой зоне: " + countlight);
-        }
+        //говорит что целей 0 и выдает ошибку при попытке вызвать массив
+        //private void ListOfTargets()
+        //{
+        //    float mindistance = Vector3.Distance(targetplayers[0].Position, Scp096.Position);
+        //    int countoutside = 0;
+        //    int countoffice = 0;
+        //    int countheavy = 0;
+        //    int countlight = 0;
+        //    bool sameZone = false;
+        //    foreach (Player target in targetplayers)
+        //    {
+        //        if (target.Zone == Scp096.Zone)
+        //        {
+        //            if (Vector3.Distance(target.Position, Scp096.Position) < mindistance)
+        //                mindistance = Vector3.Distance(target.Position, Scp096.Position);
+        //            sameZone = true;
+        //        }
+        //        else
+        //        {
+        //            switch (target.Zone)
+        //            {
+        //                case ZoneType.Entrance:
+        //                    countoffice++;
+        //                    break;
+        //                case ZoneType.Surface:
+        //                    countoutside++;
+        //                    break;
+        //                case ZoneType.HeavyContainment:
+        //                    countheavy++;
+        //                    break;
+        //                case ZoneType.LightContainment:
+        //                    countlight++;
+        //                    break;
+        //            }
+        //        }
+        //    }
+        //    if (sameZone)
+        //        if (mindistance >= 30)
+        //        {
+        //            Log.Info("Расстояние до ближайшей цели: " + mindistance.ToString() + "\n");
+        //            Scp096.ShowHint("Расстояние до ближайшей цели: " + mindistance.ToString() + "\n", 1);
+        //        }
+        //        else
+        //        { }
+        //    else
+        //    {
+        //        Log.Info("Целей на поверхности: " + countoutside + " Целей в офисной зоне: " + countoffice + "\n"
+        //            + "Целей в тяжелой зоне: " + countheavy + " Целей в легкой зоне: " + countlight);
+        //        Scp096.ShowHint("Целей на поверхности: " + countoutside + " Целей в офисной зоне: " + countoffice + "\n"
+        //            + "Целей в тяжелой зоне: " + countheavy + " Целей в легкой зоне: " + countlight);
+        //    }
+        //}
     }
 }
