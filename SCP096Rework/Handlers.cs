@@ -18,7 +18,12 @@ namespace SCP096Rework
 {
     public class Handlers
     {
+        private readonly Plugin plugin;
         List<Player> allPlayers = new List<Player>();
+        public Handlers(Plugin plugin)
+        {
+            this.plugin = plugin;
+        }
         public void OnCalmingDown(CalmingDownEventArgs ev)
         {
             if (ev.Scp096._targets.Count != 0)
@@ -69,6 +74,73 @@ namespace SCP096Rework
                 }
                 player.ShowHint("Целей в легкой зоне " + lightZoneAmount + "\nЦелей в тяжелой зоне " + heavyZoneAmount + "\nЦелей в офисной зоне " + officeZoneAmount + "\nЦелей  на поверхности " + surfaceAmount, 5f);
             }
+        }
+
+        public void OnDamage(HurtingEventArgs ev)
+        {
+            if ((ev.DamageType == DamageTypes.Nuke || ev.DamageType == DamageTypes.Wall
+                || ev.DamageType == DamageTypes.Decont) && ev.Target.Role == RoleType.Scp096)
+            {
+                if (plugin.Config.Debug)
+                    Log.Debug($"OnDamage event has been taken.\nTarget: {ev.Target.Nickname}\nRole: {ev.Target.Role}" +
+                        $"\nAmount of damage: {ev.Amount}\nDamageType: {ev.DamageType.name}");
+            }
+            else
+            {
+                ev.IsAllowed = false;
+                return;
+            }
+        }
+
+        public void OnActivatingScp914(ActivatingEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+
+        public void OnKnobChangingScp914(ChangingKnobSettingEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+
+        public void OnWarheadActivating(ActivatingWarheadPanelEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+
+        public void OnChangingWarheadStatus(ChangingLeverStatusEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+
+        public void OnClosingGenerator(ClosingGeneratorEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+
+        public void OnEjectingTabletGenerator(EjectingGeneratorTabletEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+        public void OnLockerInteract(InteractingLockerEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+        public void OnStartingWarhead(StartingEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
+        }
+        public void OnStoppingWarhead(StoppingEventArgs ev)
+        {
+            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
+                ev.IsAllowed = false;
         }
     }
 }
