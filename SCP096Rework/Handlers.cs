@@ -6,126 +6,69 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MEC;
+using PlayableScps;
 using Scp096 = PlayableScps.Scp096;
 using Exiled.API.Enums;
 using UnityEngine;
+using HarmonyLib;
+using Assets;
+using System.Reflection.Emit;
 
 namespace SCP096Rework
 {
     public class Handlers
     {
-        List<Player> targetplayers = new List<Player>();
-        List<Player> AllPlayers = new List<Player>();
-        Player Scp096;
+        List<Player> allPlayers = new List<Player>();
+        public void OnCalmingDown(CalmingDownEventArgs ev)
+        {
+            if (ev.Scp096._targets.Count != 0)
+                ev.IsAllowed = false;
+            else
+            {
+                ev.IsAllowed = true;
+                Timing.KillCoroutines();
+            }
+        }
         public void OnEnraging(EnragingEventArgs ev)
         {
-            Scp096 = ev.Player;
-            Timing.RunCoroutine(CheckForTargets(ev));
-            Timing.RunCoroutine(RefreshPosition());
-            //ListOfTargets();
+            Targets(ev.Scp096, ev.Player);
         }
-        //public void suka(ev ev)
-        //{
-        //    ev.
-        //}
-        public void OnChargingPlayer(ChargingPlayerEventArgs ev)
+        private IEnumerator<float> Targets(Scp096 scp,Player player)
         {
-            Log.Info("Добавление первой цели в список");
-            targetplayers.Add(ev.Victim);
-        }
-        public void OnAddingTarget(AddingTargetEventArgs ev)
-        {
-            targetplayers.Add(ev.Target);
-        }
-        public void OnDied(DiedEventArgs ev)
-        {
-            if (targetplayers.Contains(ev.Target))
-                targetplayers.Remove(ev.Target);
-
-        }
-        private IEnumerator<float> CheckForTargets(EnragingEventArgs ev)
-        {
-            for (; ; )
-            {
-                yield return Timing.WaitForSeconds(10f);
-                if (targetplayers.Count == 0)
-                {
-                    ev.Scp096.PlayerState = PlayableScps.Scp096PlayerState.Calming;
-                    break;
-                }
-                else
-                    ev.Scp096.PlayerState = PlayableScps.Scp096PlayerState.Enraging;
-            }
-        }
-        private IEnumerator<float> RefreshPosition()
-        {
+            allPlayers = Player.List.ToList();
+            int lightZoneAmount=0;
+            int heavyZoneAmount = 0;
+            int officeZoneAmount = 0;
+            int surfaceAmount = 0;
             for(; ; )
             {
-                yield return Timing.WaitForSeconds(1f);
-                AllPlayers = Player.List.ToList();
-                foreach (Player RandomPlayer in AllPlayers.Where(x => x.IsHuman))
+                if (scp._targets.Count == 0)
                 {
-                    foreach (Player Target in targetplayers.Where(y => y.Id == RandomPlayer.Id))
-                    {
-                        Target.Position = RandomPlayer.Position;
-                    }
+                    scp.PlayerState = PlayableScps.Scp096PlayerState.Calming;
+                    Timing.KillCoroutines();
                 }
-                foreach (Player targetscp in AllPlayers.Where(x => x.Role == RoleType.Scp096 && x.Id==Scp096.Id))
-                    Scp096 = targetscp;
-                Log.Info(targetplayers.Count.ToString());
+                yield return Timing.WaitForSeconds(5f);
+                foreach (var target in scp._targets)
+                {
+                    //foreach (var rndPlayer in allPlayers.Where(x => x.Id == target.playerId))
+                        switch (Player.Get(target.playerId).Zone)
+                        {
+                            case ZoneType.LightContainment:
+                                lightZoneAmount++;
+                                break;
+                            case ZoneType.HeavyContainment:
+                                heavyZoneAmount++;
+                                break;
+                            case ZoneType.Entrance:
+                                officeZoneAmount++;
+                                break;
+                            case ZoneType.Surface:
+                                surfaceAmount++;
+                                break;
+                        }
+                }
+                player.ShowHint("Целей в легкой зоне " + lightZoneAmount + "\nЦелей в тяжелой зоне " + heavyZoneAmount + "\nЦелей в офисной зоне " + officeZoneAmount + "\nЦелей  на поверхности " + surfaceAmount, 5f);
             }
         }
-        //говорит что целей 0 и выдает ошибку при попытке вызвать массив
-        //private void ListOfTargets()
-        //{
-        //    float mindistance = Vector3.Distance(targetplayers[0].Position, Scp096.Position);
-        //    int countoutside = 0;
-        //    int countoffice = 0;
-        //    int countheavy = 0;
-        //    int countlight = 0;
-        //    bool sameZone = false;
-        //    foreach (Player target in targetplayers)
-        //    {
-        //        if (target.Zone == Scp096.Zone)
-        //        {
-        //            if (Vector3.Distance(target.Position, Scp096.Position) < mindistance)
-        //                mindistance = Vector3.Distance(target.Position, Scp096.Position);
-        //            sameZone = true;
-        //        }
-        //        else
-        //        {
-        //            switch (target.Zone)
-        //            {
-        //                case ZoneType.Entrance:
-        //                    countoffice++;
-        //                    break;
-        //                case ZoneType.Surface:
-        //                    countoutside++;
-        //                    break;
-        //                case ZoneType.HeavyContainment:
-        //                    countheavy++;
-        //                    break;
-        //                case ZoneType.LightContainment:
-        //                    countlight++;
-        //                    break;
-        //            }
-        //        }
-        //    }
-        //    if (sameZone)
-        //        if (mindistance >= 30)
-        //        {
-        //            Log.Info("Расстояние до ближайшей цели: " + mindistance.ToString() + "\n");
-        //            Scp096.ShowHint("Расстояние до ближайшей цели: " + mindistance.ToString() + "\n", 1);
-        //        }
-        //        else
-        //        { }
-        //    else
-        //    {
-        //        Log.Info("Целей на поверхности: " + countoutside + " Целей в офисной зоне: " + countoffice + "\n"
-        //            + "Целей в тяжелой зоне: " + countheavy + " Целей в легкой зоне: " + countlight);
-        //        Scp096.ShowHint("Целей на поверхности: " + countoutside + " Целей в офисной зоне: " + countoffice + "\n"
-        //            + "Целей в тяжелой зоне: " + countheavy + " Целей в легкой зоне: " + countlight);
-        //    }
-        //}
     }
 }

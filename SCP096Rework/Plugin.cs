@@ -15,23 +15,21 @@ namespace SCP096Rework
     {
         public override string Name { get; } = "SCP096Rework";
         public override string Author { get; } = ".fkn_goose";
-        public override Version Version => new Version(0, 0, 1);
+        public override Version Version => new Version(0, 3, 0);
         public static readonly Lazy<Plugin> LazyInstance = new Lazy<Plugin>(valueFactory: () => new Plugin());
         public static Plugin PluginItem => LazyInstance.Value;
         private Handlers handlers;
         public override void OnEnabled()
         {
             handlers = new Handlers();
-            PlayerEv.Died += handlers.OnDied;
             Scp096.Enraging += handlers.OnEnraging;
-            Scp096.ChargingPlayer += handlers.OnChargingPlayer;
+            Scp096.CalmingDown += handlers.OnCalmingDown;
             base.OnEnabled();
         }
         public override void OnDisabled()
         {
-            PlayerEv.Died -= handlers.OnDied;
             Scp096.Enraging -= handlers.OnEnraging;
-            Scp096.ChargingPlayer -= handlers.OnChargingPlayer;
+            Scp096.CalmingDown -= handlers.OnCalmingDown;
             handlers = null;
             base.OnDisabled();
         }
