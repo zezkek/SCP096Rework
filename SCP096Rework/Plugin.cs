@@ -20,6 +20,8 @@ namespace SCP096Rework
     {
         public override string Name { get; } = "SCP096Rework";
         public override string Author { get; } = ".fkn_goose & Mydak";
+
+        public override string Prefix => "SCP096Rework";
         public override Version Version => new Version(0, 3, 1);
         public static readonly Lazy<Plugin> LazyInstance = new Lazy<Plugin>(valueFactory: () => new Plugin());
         public static Plugin PluginItem => LazyInstance.Value;

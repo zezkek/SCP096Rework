@@ -78,8 +78,9 @@ namespace SCP096Rework
 
         public void OnDamage(HurtingEventArgs ev)
         {
-            if ((ev.DamageType == DamageTypes.Nuke || ev.DamageType == DamageTypes.Wall
-                || ev.DamageType == DamageTypes.Decont) && ev.Target.Role == RoleType.Scp096)
+            if (!ev.IsAllowed || ev.Target.Role != RoleType.Scp096) return;
+            if (ev.DamageType == DamageTypes.Nuke || ev.DamageType == DamageTypes.Wall
+                || ev.DamageType == DamageTypes.Decont)
             {
                 if (plugin.Config.Debug)
                     Log.Debug($"OnDamage event has been taken.\nTarget: {ev.Target.Nickname}\nRole: {ev.Target.Role}" +
