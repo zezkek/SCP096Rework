@@ -19,7 +19,6 @@ namespace SCP096Rework
     public class Handlers
     {
         private readonly Plugin plugin;
-        List<Player> allPlayers = new List<Player>();
         public Handlers(Plugin plugin)
         {
             this.plugin = plugin;
@@ -40,7 +39,6 @@ namespace SCP096Rework
         }
         private IEnumerator<float> Targets(Scp096 scp,Player player)
         {
-            allPlayers = Player.List.ToList();
             int lightZoneAmount=0;
             int heavyZoneAmount = 0;
             int officeZoneAmount = 0;
@@ -123,7 +121,7 @@ namespace SCP096Rework
                 ev.IsAllowed = false;
         }
 
-        public void OnEjectingTabletGenerator(EjectingGeneratorTabletEventArgs ev)
+        public void OnStoppingGenerator(StoppingGeneratorEventArgs ev)
         {
             if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
                 ev.IsAllowed = false;

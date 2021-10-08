@@ -22,7 +22,7 @@ namespace SCP096Rework
         public override string Author { get; } = ".fkn_goose & Mydak";
 
         public override string Prefix => "SCP096Rework";
-        public override Version Version => new Version(0, 3, 1);
+        public override Version Version => new Version(0, 3, 4);
         public static readonly Lazy<Plugin> LazyInstance = new Lazy<Plugin>(valueFactory: () => new Plugin());
         public static Plugin PluginItem => LazyInstance.Value;
         private Handlers handlers;
@@ -37,7 +37,7 @@ namespace SCP096Rework
             Scp914Events.ChangingKnobSetting += handlers.OnKnobChangingScp914;
             WarhEvents.ChangingLeverStatus += handlers.OnChangingWarheadStatus;
             PlayerEvents.ClosingGenerator += handlers.OnClosingGenerator;
-            PlayerEvents.EjectingGeneratorTablet += handlers.OnEjectingTabletGenerator;
+            PlayerEvents.StoppingGenerator += handlers.OnStoppingGenerator;
             PlayerEvents.InteractingLocker += handlers.OnLockerInteract;
             WarhEvents.Starting += handlers.OnStartingWarhead;
             WarhEvents.Stopping += handlers.OnStoppingWarhead;
@@ -54,7 +54,7 @@ namespace SCP096Rework
             Scp914Events.ChangingKnobSetting -= handlers.OnKnobChangingScp914;
             WarhEvents.ChangingLeverStatus -= handlers.OnChangingWarheadStatus;
             PlayerEvents.ClosingGenerator -= handlers.OnClosingGenerator;
-            PlayerEvents.EjectingGeneratorTablet -= handlers.OnEjectingTabletGenerator;
+            PlayerEvents.StoppingGenerator -= handlers.OnStoppingGenerator;
             PlayerEvents.InteractingLocker -= handlers.OnLockerInteract;
             WarhEvents.Starting -= handlers.OnStartingWarhead;
             WarhEvents.Stopping -= handlers.OnStoppingWarhead;
