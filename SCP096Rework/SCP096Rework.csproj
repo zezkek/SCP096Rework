@@ -120,6 +120,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Events\Doors.cs" />
+    <Compile Include="Events\Generators.cs" />
+    <Compile Include="Events\SCP914.cs" />
+    <Compile Include="Events\Warhead.cs" />
+    <Compile Include="Events\Workstation.cs" />
     <Compile Include="Handlers.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

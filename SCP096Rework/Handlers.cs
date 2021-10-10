@@ -19,12 +19,16 @@ namespace SCP096Rework
     public class Handlers
     {
         private readonly Plugin plugin;
+        public static Dictionary<Player, bool> angryScp096s = new Dictionary<Player, bool> { };
         public Handlers(Plugin plugin)
         {
             this.plugin = plugin;
         }
         public void OnCalmingDown(CalmingDownEventArgs ev)
         {
+            if (angryScp096s.ContainsKey(ev.Player))
+                angryScp096s.Remove(ev.Player);
+#if Full
             if (ev.Scp096._targets.Count != 0)
                 ev.IsAllowed = false;
             else
@@ -32,11 +36,17 @@ namespace SCP096Rework
                 ev.IsAllowed = true;
                 Timing.KillCoroutines();
             }
+#endif
         }
         public void OnEnraging(EnragingEventArgs ev)
         {
+            if (!angryScp096s.ContainsKey(ev.Player))
+                angryScp096s.Add(ev.Player, true);
+#if Full
             Targets(ev.Scp096, ev.Player);
+#endif
         }
+#if Full
         private IEnumerator<float> Targets(Scp096 scp,Player player)
         {
             int lightZoneAmount=0;
@@ -73,73 +83,20 @@ namespace SCP096Rework
                 player.ShowHint("Целей в легкой зоне " + lightZoneAmount + "\nЦелей в тяжелой зоне " + heavyZoneAmount + "\nЦелей в офисной зоне " + officeZoneAmount + "\nЦелей  на поверхности " + surfaceAmount, 5f);
             }
         }
-
+#endif
         public void OnDamage(HurtingEventArgs ev)
         {
             if (!ev.IsAllowed || ev.Target.Role != RoleType.Scp096) return;
-            if (ev.DamageType == DamageTypes.Nuke || ev.DamageType == DamageTypes.Wall
-                || ev.DamageType == DamageTypes.Decont)
+            Log.Debug($"OnDamage event has been taken.\nTarget: {ev.Target.Nickname}\nRole: {ev.Target.Role}" +
+                      $"\nAmount of damage: {ev.Amount}\nDamageType: {ev.DamageType.Name}", plugin.Config.Debug);
+            if (ev.DamageType == DamageTypes.Nuke || ev.DamageType == DamageTypes.Wall || ev.DamageType == DamageTypes.Decont)
             {
-                if (plugin.Config.Debug)
-                    Log.Debug($"OnDamage event has been taken.\nTarget: {ev.Target.Nickname}\nRole: {ev.Target.Role}" +
-                        $"\nAmount of damage: {ev.Amount}\nDamageType: {ev.DamageType.name}");
+                return;
             }
             else
             {
                 ev.IsAllowed = false;
-                return;
             }
-        }
-
-        public void OnActivatingScp914(ActivatingEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-
-        public void OnKnobChangingScp914(ChangingKnobSettingEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-
-        public void OnWarheadActivating(ActivatingWarheadPanelEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-
-        public void OnChangingWarheadStatus(ChangingLeverStatusEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-
-        public void OnClosingGenerator(ClosingGeneratorEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-
-        public void OnStoppingGenerator(StoppingGeneratorEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-        public void OnLockerInteract(InteractingLockerEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-        public void OnStartingWarhead(StartingEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
-        }
-        public void OnStoppingWarhead(StoppingEventArgs ev)
-        {
-            if (!ev.IsAllowed || ev.Player.Role == RoleType.Scp096)
-                ev.IsAllowed = false;
         }
     }
 }
