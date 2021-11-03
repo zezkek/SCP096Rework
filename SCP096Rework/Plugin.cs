@@ -17,15 +17,21 @@ namespace SCP096Rework
 {
     public class Plugin : Plugin<Config>
     {
-        public override string Name { get; } = "SCP096Rework [CUTTED]";
+        public override string Name { get; } = "SCP096Rework";
         public override string Author { get; } = ".fkn_goose & Mydak";
 
         public override string Prefix => "SCP096Rework";
-        public override Version Version => new Version(1, 0, 0);
+        public override Version Version => new Version(1, 1, 0);
 
         private static readonly Plugin InstanceValue = new Plugin();
 
-        public override Version RequiredExiledVersion { get; } = new Version(3, 0, 4);
+        private readonly List<MEC.CoroutineHandle> coroutines = new List<MEC.CoroutineHandle>();
+
+        public void AddCoroutine(MEC.CoroutineHandle coroutineHandle) => this.coroutines.Add(coroutineHandle);
+
+        public void NewCoroutine(IEnumerator<float> coroutine, MEC.Segment segment = MEC.Segment.Update) => this.coroutines.Add(MEC.Timing.RunCoroutine(coroutine, segment));
+
+        public override Version RequiredExiledVersion { get; } = new Version(3, 3, 1);
         private Plugin()
         {
         }
@@ -56,6 +62,7 @@ namespace SCP096Rework
 
             Scp096Events.Enraging += handlers.OnEnraging;
             Scp096Events.CalmingDown += handlers.OnCalmingDown;
+            PlayerEvents.ChangingRole += handlers.OnChangingRole;
 
             PlayerEvents.Hurting += handlers.OnDamage;
 
@@ -85,6 +92,7 @@ namespace SCP096Rework
         {
             Scp096Events.Enraging -= handlers.OnEnraging;
             Scp096Events.CalmingDown -= handlers.OnCalmingDown;
+            PlayerEvents.ChangingRole -= handlers.OnChangingRole;
 
             PlayerEvents.Hurting += handlers.OnDamage;
 
