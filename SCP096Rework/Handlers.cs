@@ -18,16 +18,12 @@ namespace SCP096Rework
     public class Handlers
     {
         private readonly Plugin plugin;
-        public static Dictionary<Player, bool> angryScp096s = new Dictionary<Player, bool> { };
         public Handlers(Plugin plugin)
         {
             this.plugin = plugin;
         }
         public void OnCalmingDown(CalmingDownEventArgs ev)
         {
-            if (angryScp096s.ContainsKey(ev.Player))
-                angryScp096s.Remove(ev.Player);
-
             if (ev.Scp096._targets.Count != 0)
                 ev.IsAllowed = false;
             else
@@ -42,16 +38,17 @@ namespace SCP096Rework
             {
                 Plugin.Instance.NewCoroutine(StatsMsg(ev.Player));
             }
-            PlayableScps.Scp096 scp = (PlayableScps.Scp096)Player.List.Where(x => x.Role == RoleType.Scp096).First()?.CurrentScp;
-            if(scp != null)
-            {
-                scp._targets.Remove(ev.Player.ReferenceHub);
-            }
-        }
-        public void OnEnraging(EnragingEventArgs ev)
-        {
-            if (!angryScp096s.ContainsKey(ev.Player))
-                angryScp096s.Add(ev.Player, true);
+            Timing.CallDelayed(0.1f, () => {
+                if (Player.List.Where(x => x.Role == RoleType.Scp096).Count() > 0)
+                {
+                    PlayableScps.Scp096 scp = (PlayableScps.Scp096)Player.List.Where(x => x.Role == RoleType.Scp096).First()?.CurrentScp;
+                    if (scp != null)
+                    {
+                        scp._targets.Remove(ev.Player.ReferenceHub);
+                    }
+                }
+            });
+
         }
 
         /// <summary>
@@ -87,8 +84,9 @@ namespace SCP096Rework
         {
             yield return MEC.Timing.WaitForSeconds(1f);
             int showName = 7;
-            PlayableScps.Scp096 scp = (PlayableScps.Scp096)player.CurrentScp;
+
             Log.Debug("Coroutine statsMsg has started.", Plugin.Instance.Config.Debug);
+            short enraseDelay = 1; 
             while (player != null)
             {
                 try
@@ -99,9 +97,11 @@ namespace SCP096Rework
                     {
                         yield break;
                     }
-
-                    if (scp?._targets.Count > 0)
+                    PlayableScps.Scp096 scp = (PlayableScps.Scp096)player.CurrentScp;
+                    if (scp._targets.Count > 0)
                     {
+                        enraseDelay = 3;
+                        player.CanSendInputs = true;
                         Dictionary<ZoneType, HashSet<Player>> targetsZones = new Dictionary<ZoneType, HashSet<Player>> { };
                         response = "<align=left><pos=-21%><size=25><color=#C1B5B5><b>МЕСТОНАХОЖДЕНИЕ ЦЕЛЕЙ</b></color></pos></align>\n";
 
@@ -174,13 +174,41 @@ namespace SCP096Rework
                         {
                             if (GetZone(closest, out ZoneType targetZone) == GetZone(player, out ZoneType playerZone))
                             {
-                                response += $"\n<align=left><b><size=20><pos=-21%><color=#990000>ДИСТАНЦИЯ</color></pos><pos=-7%> :  <color=#C1B5B5>{Vector3.Distance(closest.Position, player.Position)}</color></pos></size></b></align>\n";
+                                string exceptions = string.Empty;
+                                if(playerZone == ZoneType.HeavyContainment)
+                                {
+                                    if(player.Position.y > -600)
+                                    {
+                                        exceptions = "<color=#990000>[БОЕГОЛОВКА]</color>";
+                                    }
+                                    if(player.Position.y > -750)
+                                    {
+                                        exceptions = "<color=#990000>[КОМНАТА СОД. SCP-049]</color>";
+                                    }
+                                }
+                                response += $"\n<align=left><b><size=20><pos=-21%><color=#990000>ДИСТАНЦИЯ</color></pos><pos=-7%> :  <color=#C1B5B5>{Vector3.Distance(closest.Position, player.Position)} м.</color> {exceptions}</pos></size></b></align>\n";
                             }
 
                             lines -= 2;
                         }
                     }
+                    else if(scp._targets.Count == 0 && scp.EnragedOrEnraging)
+                    {
+                        if(enraseDelay <= 0) 
+                        {
+                            player.EnableEffect(EffectType.Ensnared, 1.5f);
+                            player.CanSendInputs = false;
+                        }
+                        else
+                        {
+                            enraseDelay--;
+                        }
 
+                    }
+                    else
+                    {
+                        player.DisableEffect(EffectType.Ensnared);
+                    }
                     if (lines != 11)
                     {
                         response += "\n";

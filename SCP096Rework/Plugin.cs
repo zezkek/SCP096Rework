@@ -60,7 +60,6 @@ namespace SCP096Rework
 
             handlers = new Handlers(this);
 
-            Scp096Events.Enraging += handlers.OnEnraging;
             Scp096Events.CalmingDown += handlers.OnCalmingDown;
             PlayerEvents.ChangingRole += handlers.OnChangingRole;
 
@@ -90,7 +89,6 @@ namespace SCP096Rework
         }
         public override void OnDisabled()
         {
-            Scp096Events.Enraging -= handlers.OnEnraging;
             Scp096Events.CalmingDown -= handlers.OnCalmingDown;
             PlayerEvents.ChangingRole -= handlers.OnChangingRole;
 

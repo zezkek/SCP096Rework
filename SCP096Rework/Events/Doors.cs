@@ -42,15 +42,15 @@
             {
                 return;
             }
-
+            PlayableScps.Scp096 scp = (PlayableScps.Scp096)ev.Player.CurrentScp;
             if (ev.Door.IsOpen && Plugin.Instance.Config.RestrictedOpenedDoorsAccess)
             {
                 ev.IsAllowed = false;
             }
-            else if (Plugin.Instance.Config.SpecDoorAccess.Contains(ev.Door.Type))
+
+            else if (Plugin.Instance.Config.SpecDoorAccess.Contains(ev.Door.Type) && !scp.Enraged)
             {
-                if (!Handlers.angryScp096s.ContainsKey(ev.Player))
-                    ev.IsAllowed = false;
+                ev.IsAllowed = false;
             }
         }
     }
