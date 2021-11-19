@@ -101,7 +101,6 @@ namespace SCP096Rework
                     if (scp._targets.Count > 0)
                     {
                         enraseDelay = 3;
-                        player.CanSendInputs = true;
                         Dictionary<ZoneType, HashSet<Player>> targetsZones = new Dictionary<ZoneType, HashSet<Player>> { };
                         response = "<align=left><pos=-21%><size=25><color=#C1B5B5><b>МЕСТОНАХОЖДЕНИЕ ЦЕЛЕЙ</b></color></pos></align>\n";
 
@@ -192,6 +191,7 @@ namespace SCP096Rework
                             lines -= 2;
                         }
                     }
+#if PreventAttack
                     else if(scp._targets.Count == 0 && scp.EnragedOrEnraging)
                     {
                         if(enraseDelay <= 0) 
@@ -208,7 +208,9 @@ namespace SCP096Rework
                     else
                     {
                         player.DisableEffect(EffectType.Ensnared);
+                        player.CanSendInputs = true;
                     }
+#endif
                     if (lines != 11)
                     {
                         response += "\n";
